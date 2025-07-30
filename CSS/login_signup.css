@@ -264,12 +264,12 @@ article {
 
 
 /* PC */
-@media (min-width: 1200px) {
+@media (max-width: 1920px) {
   
 }
 
 /* Tablet 744~1199px */
-@media (min-width: 744px) {
+@media (max-width: 1199px) {
   
 }
 
