@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, ChangeEvent } from "react";
+import { useState, ChangeEvent, CompositionEvent } from "react";
 import Image from "next/image";
 
 interface InputFieldProps {
@@ -10,6 +10,8 @@ interface InputFieldProps {
   placeholder?: string;
   value: string | number;
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  onCompositionStart?: (e: CompositionEvent<HTMLInputElement>) => void;
+  onCompositionEnd?: (e: CompositionEvent<HTMLInputElement>) => void;
 }
 
 const InputField = ({

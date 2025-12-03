@@ -30,6 +30,7 @@ export interface SignupPayload {
 // 로그인 관련 타입 정의
 export interface LoginResponse {
   accessToken?: string;
+  refreshToken?: string;
   user?: User;
 }
 
@@ -49,3 +50,10 @@ export interface AuthContextType {
   ) => Promise<void>;
   updateUser: (formData: Partial<User>) => Promise<void>;
 }
+
+export type AuthState = {
+  isAuthenticated: boolean;
+  accessToken?: string | null;
+  refreshToken?: string | null;
+  user?: User | null;
+};

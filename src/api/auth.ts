@@ -1,5 +1,6 @@
 import { defaultFetch } from "@/api/fetchClient";
 import { LoginProps, LoginResponse, SignupProps } from "@/types/auth";
+import { apiClient } from "@/api/apiClient";
 
 export const authService = {
   // 로그인
@@ -8,11 +9,6 @@ export const authService = {
       method: "POST",
       body: JSON.stringify({ email, password }),
     });
-
-    // 서버에서 받은 토큰 localStorage에 저장
-    if (res.accessToken) {
-      localStorage.setItem("accessToken", res.accessToken);
-    }
 
     return res;
   },
@@ -28,10 +24,13 @@ export const authService = {
       body: JSON.stringify({ nickname, email, password }),
     });
 
-    if (res.accessToken) {
-      localStorage.setItem("accessToken", res.accessToken);
-    }
-
     return res;
+  },
+
+  validate: async (token: string) => {
+    const res = await apiClient.get("/auth/validate", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return res.data;
   },
 };

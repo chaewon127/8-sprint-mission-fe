@@ -6,9 +6,9 @@ export const uploadImage = async (
   token: string
 ): Promise<string> => {
   const formData = new FormData();
-  formData.append("image", file);
+  formData.append("images", file);
 
-  const res = await fetch(`${IMAGE_API_URL}/upload`, {
+  const res = await fetch(`${IMAGE_API_URL}`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -20,6 +20,6 @@ export const uploadImage = async (
     throw new Error(`이미지 업로드 실패: ${res.status}`);
   }
 
-  const data: { url: string } = await res.json();
-  return data.url;
+  const data = await res.json();
+  return data.images[0];
 };

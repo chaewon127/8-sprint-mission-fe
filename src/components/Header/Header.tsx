@@ -4,11 +4,11 @@ import Logo from "./Logo/Logo";
 import Nav from "./Navigator/Navigator";
 import Link from "next/link";
 import Image from "next/image";
-import { useAuth } from "@/providers/AuthProvider";
+import { useAuthContext } from "@/providers/AuthProvider";
 import { User } from "@/types/auth";
 
 const Header = () => {
-  const { user } = useAuth() as { user: User | null };
+  const { user } = useAuthContext() as { user: User | null };
 
   return (
     <header className="sticky top-0 z-[100] flex justify-center items-center w-full h-[70px] border-b border-[#DFDFDF] bg-white">

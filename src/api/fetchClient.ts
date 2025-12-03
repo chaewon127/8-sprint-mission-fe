@@ -4,6 +4,11 @@ export interface FetchOptions extends RequestInit {
 
 type FetchResult = Record<string, unknown> | { status: number; ok: boolean };
 
+function isJsonResponse(response: Response): boolean {
+  const type = response.headers.get("content-type");
+  return type !== null && type.includes("application/json");
+}
+
 export const defaultFetch = async <T = unknown>(
   url: string,
   options: FetchOptions = {}
@@ -17,7 +22,8 @@ export const defaultFetch = async <T = unknown>(
     ? url
     : `${baseURL.replace(/\/$/, "")}/${url.replace(/^\//, "")}`;
 
-  const accessToken = localStorage.getItem("accessToken"); //CORS 문제 해결을 위해 로컬스토리지에서 토큰 가져오기
+  const accessToken =
+    typeof window !== "undefined" ? localStorage.getItem("accessToken") : null; //CORS 문제 해결을 위해 로컬스토리지에서 토큰 가져오기
 
   const defaultOptions: FetchOptions = {
     headers: {
@@ -47,12 +53,12 @@ export const defaultFetch = async <T = unknown>(
       throw new Error(`API error: ${response.status}`);
     }
 
-    const contentType = response.headers.get("content-type");
-    if (contentType?.includes("application/json")) {
-      return (await response.json()) as T;
+    if (response.status === 204) {
+      // @ts-expect-error API가 아무것도 안 줄 경우
+      return { status: 204 } satisfies T;
     }
 
-    return { status: response.status, ok: response.ok } as unknown as T;
+    return (await response.json()) as T;
   } catch (error) {
     console.error("네트워크 에러:", error);
     throw error;
@@ -126,10 +132,10 @@ export const cookieFetch = async <T = unknown>(
     throw new Error(`API error: ${response.status}`);
   }
 
-  const contentType = response.headers.get("content-type");
-  if (contentType && contentType.includes("application/json")) {
-    return (await response.json()) as T;
+  if (response.status === 204) {
+    // @ts-expect-error API가 아무것도 안 줄 경우
+    return { status: 204 } satisfies T;
   }
 
-  return { status: response.status, ok: response.ok } as unknown as T;
+  return (await response.json()) as T;
 };

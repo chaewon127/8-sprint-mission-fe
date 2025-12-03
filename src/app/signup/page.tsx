@@ -25,9 +25,12 @@ const SignupPage = () => {
 
   useEffect(() => {
     const accessToken = localStorage.getItem("accessToken");
-    if (accessToken) {
-      router.push("/items");
-    }
+    if (!accessToken) return;
+
+    authService
+      .validate(accessToken)
+      .then(() => router.push("/items"))
+      .catch(() => {});
   }, [router]);
 
   const signupMutation = useMutation({

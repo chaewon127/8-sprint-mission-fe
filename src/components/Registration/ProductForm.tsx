@@ -1,6 +1,12 @@
 "use client";
 
-import { useState, useEffect, KeyboardEvent, ChangeEvent } from "react";
+import {
+  useState,
+  useEffect,
+  KeyboardEvent,
+  ChangeEvent,
+  CompositionEvent,
+} from "react";
 import RegistrationController from "./RegistrationController";
 import ImageForm from "../InputField/ImageForm";
 import InputField from "@/components/InputField/InputField";
@@ -19,6 +25,7 @@ const ProductForm = ({
   const [price, setPrice] = useState<string>("");
   const [tagInput, setTagInput] = useState<string>("");
   const [tags, setTags] = useState<string[]>([]);
+  const [isComposing, setIsComposing] = useState<boolean>(false);
 
   useEffect(() => {
     if (mode === "edit" && initialData) {
@@ -31,7 +38,36 @@ const ProductForm = ({
   }, [mode, initialData]);
 
   const isFormValid =
-    title.trim() !== "" && description.trim() !== "" && price.trim() !== "";
+    title.trim() !== "" &&
+    description.trim() !== "" &&
+    price.trim() !== "" &&
+    !isNaN(Number(price));
+
+  // 가격 입력 검증
+  const handlePriceChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+
+    if (isComposing) return;
+
+    if (value === "") {
+      setPrice("");
+      return;
+    }
+
+    if (!/^\d+$/.test(value)) return;
+
+    setPrice(value);
+  };
+
+  // IME (한글 입력) 처리
+  const handleCompositionStart = (_e: CompositionEvent<HTMLInputElement>) => {
+    setIsComposing(true);
+  };
+  const handleCompositionEnd = (e: CompositionEvent<HTMLInputElement>) => {
+    setIsComposing(false);
+    const finalValue = e.currentTarget.value;
+    if (/^\d+$/.test(finalValue)) setPrice(finalValue);
+  };
 
   const handleSubmit = async () => {
     if (!isFormValid) return;
@@ -39,12 +75,19 @@ const ProductForm = ({
   };
 
   const handleTagKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && tagInput.trim()) {
+    if (isComposing) return;
+
+    if (e.key === "Enter") {
       e.preventDefault();
-      if (tags.length < 5) {
-        setTags([...tags, tagInput.trim()]);
-        setTagInput("");
-      }
+      const value = tagInput.trim();
+
+      if (!value) return;
+      if (value.length > 10) return;
+      if (tags.length >= 5) return;
+      if (tags.includes(value)) return;
+
+      setTags([...tags, value]);
+      setTagInput("");
     }
   };
 
@@ -90,9 +133,9 @@ const ProductForm = ({
           id="price"
           placeholder="판매가격을 입력해주세요."
           value={price}
-          onChange={(e: ChangeEvent<HTMLInputElement>) =>
-            setPrice(e.target.value)
-          }
+          onChange={handlePriceChange}
+          onCompositionStart={handleCompositionStart}
+          onCompositionEnd={handleCompositionEnd}
         />
 
         <form className="flex flex-col items-start gap-4 w-full mb-8">
@@ -105,8 +148,9 @@ const ProductForm = ({
               setTagInput(e.target.value)
             }
             onKeyDown={handleTagKeyDown}
+            onCompositionStart={() => setIsComposing(true)}
+            onCompositionEnd={() => setIsComposing(false)}
             maxLength={5}
-            required
             className="w-full h-14 rounded-xl bg-gray-100 px-6 placeholder-gray-400 text-black focus:outline-none focus:ring-2 focus:ring-gray-400"
           />
           {/* <span className="hidden text-red-500 text-sm font-semibold mt-2">

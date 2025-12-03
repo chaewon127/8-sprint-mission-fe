@@ -9,7 +9,7 @@ import AuthButton from "@/components/AuthPage/AuthButton";
 import SocialLogin from "@/components/AuthPage/SocialLogin";
 import Modal from "@/components/AuthPage/Modal";
 import { authService } from "@/api/auth";
-import { useAuth } from "@/providers/AuthProvider";
+import { useAuthContext } from "@/providers/AuthProvider";
 
 const LoginPage = () => {
   const [email, setEmail] = useState<string>("");
@@ -20,7 +20,7 @@ const LoginPage = () => {
 
   const router = useRouter();
 
-  const { login } = useAuth();
+  const { login } = useAuthContext();
 
   const handleLogin = async () => {
     if (!email || !password) {
