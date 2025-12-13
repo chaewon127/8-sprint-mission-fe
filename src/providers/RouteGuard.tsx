@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { useAuth } from "./AuthProvider";
+import { useAuthContext } from "./AuthProvider";
 import { User } from "@/types/auth";
 import { ReactNodeType } from "@/types/common";
 
@@ -23,7 +23,7 @@ const protectedPaths = [
 const publicPaths = ["/", "/login", "/signup"];
 
 export default function RouteGuard({ children }: ReactNodeType) {
-  const { user } = useAuth();
+  const { user } = useAuthContext();
   const router = useRouter();
   const pathname = usePathname();
   const [isLoading, setIsLoading] = useState<boolean>(true);
